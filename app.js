@@ -1,51 +1,61 @@
-// 1. "قاعدة البيانات" المؤقتة (لبيانات البطاقة فقط)
-const gamesDB = [
-  {
-    id: 1,
-    title: "مغامرة البطل",
-    developer: "Studio X",
-    genre: "مغامرات",
-    price: "مجاني",
-    rating: 4.5,
-    coverImage: "https://via.placeholder.com/300x150/007bff/ffffff?text=Game+Cover"
-  },
-  {
-    id: 2,
-    title: "سباق الصحراء",
-    developer: "Speed Inc.",
-    genre: "سباقات",
-    price: "$9.99",
-    rating: 4.2,
-    coverImage: "https://via.placeholder.com/300x150/28a745/ffffff?text=Game+Cover"
-  },
-  {
-    id: 3,
-    title: "لغز الفضاء",
-    developer: "Mind Games",
-    genre: "ألغاز",
-    price: "$4.99",
-    rating: 4.8,
-    coverImage: "https://via.placeholder.com/300x150/ffc107/000000?text=Game+Cover"
-  },
-  {
-    id: 4,
-    title: "حرب النجوم",
-    developer: "Galaxy Dev",
-    genre: "أكشن",
-    price: "$19.99",
-    rating: 4.0,
-    coverImage: "https://via.placeholder.com/300x150/dc3545/ffffff?text=Game+Cover"
-  }
-];
+// استيراد قاعدة البيانات من ملف الإعداد الجديد
+import { db, getDocs, collection } from './firebase-init.js';
 
+let allGames = []; // سيتم تخزين الألعاب من فايرستور هنا
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     
     const gameGrid = document.getElementById("game-grid");
     const searchInput = document.getElementById("searchInput");
-    const filterButtons = document.querySelectorAll(".filter-btn"); // الحصول على أزرار الفلاتر
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const featuredBanner = document.querySelector(".featured-banner");
+    
+    // مؤشر تحميل مؤقت
+    gameGrid.innerHTML = "<p>يتم تحميل الألعاب من قاعدة البيانات...</p>";
 
-    // دالة عرض الألعاب
+    // --- (جديد) جلب الألعاب من Firestore ---
+    async function fetchAndDisplayGames() {
+        try {
+            // جلب مستندات الألعاب من مجموعة "games"
+            const querySnapshot = await getDocs(collection(db, "games"));
+            // تحويل البيانات + إضافة ID المستند
+            allGames = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            if (allGames.length === 0) {
+                gameGrid.innerHTML = "<p>لم يتم العثور على ألعاب. يرجى إضافتها في لوحة تحكم Firestore.</p>";
+            } else {
+                displayGames(allGames);
+                // تحديث اللعبة المميزة بعد جلب البيانات
+                setupFeaturedGame();
+            }
+        } catch (error) {
+            console.error("Error fetching games: ", error);
+            gameGrid.innerHTML = "<p>حدث خطأ أثناء تحميل الألعاب. تأكد من إعدادات الأمان في Firestore.</p>";
+        }
+    }
+
+    // (جديد) دالة لإعداد اللعبة المميزة (بنفس المنطق القديم)
+    function setupFeaturedGame() {
+        // البحث عن اللعبة التي لها ID "1" (كما في الكود الأصلي)
+        const featuredGame = allGames.find(game => game.id === '1'); 
+        
+        if (featuredGame && featuredBanner) {
+            // استخدام المسار الأصلي للعبة المميزة "momiz"
+            const featuredHTML = `
+                <a href="game.html?id=${featuredGame.id}" class="featured-link">
+                    <img src="images/momiz/1.webp" alt="${featuredGame.title}">
+                    <div class="featured-info">
+                        <h2>${featuredGame.title}</h2>
+                        <p>${featuredGame.description}</p>
+                        <span>اكتشف المزيد...</span>
+                    </div>
+                </a>
+            `;
+            featuredBanner.innerHTML = featuredHTML;
+        }
+    }
+
+    // دالة عرض الألعاب (معدلة لتستخدم بيانات Firestore)
     function displayGames(gamesList) {
         gameGrid.innerHTML = "";
         
@@ -64,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <p>المطور: ${game.developer}</p>
                             <div class="game-card-footer">
                                 <span class="price">${game.price}</span>
-                                <span class="rating">⭐ ${game.rating}</span>
+                                <span class="rating">⭐ ${game.rating || 0}</span>
                             </div>
                         </div>
                     </div>
@@ -74,21 +84,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // عرض جميع الألعاب عند التحميل
-    displayGames(gamesDB);
+    // جلب الألعاب عند التحميل
+    fetchAndDisplayGames();
 
-    // تفعيل البحث
+    // تفعيل البحث (يعمل على allGames التي تم جلبها)
     searchInput.addEventListener("keyup", (event) => {
         const searchTerm = event.target.value.toLowerCase();
         
-        const filteredGames = gamesDB.filter(game => {
+        const filteredGames = allGames.filter(game => {
             return game.title.toLowerCase().includes(searchTerm);
         });
         
         displayGames(filteredGames);
     });
 
-    // تفعيل الفلاتر
+    // تفعيل الفلاتر (يعمل على allGames التي تم جلبها)
     filterButtons.forEach(button => {
         button.addEventListener("click", () => {
             
@@ -99,11 +109,11 @@ document.addEventListener("DOMContentLoaded", () => {
             let filteredGames = [];
 
             if (filterValue === "all") {
-                filteredGames = gamesDB;
+                filteredGames = allGames;
             } else if (filterValue === "free") {
-                filteredGames = gamesDB.filter(game => game.price.toLowerCase() === "مجاني");
+                filteredGames = allGames.filter(game => game.price.toLowerCase() === "مجاني");
             } else {
-                filteredGames = gamesDB.filter(game => game.genre === filterValue);
+                filteredGames = allGames.filter(game => game.genre === filterValue);
             }
             
             displayGames(filteredGames);
