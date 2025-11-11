@@ -17,10 +17,20 @@ body {
     border-bottom: 2px solid #007bff; /* لون مميز لـ AZIZ STORE */
 }
 
+/* --- تم التعديل هنا --- */
 .logo {
     font-size: 1.8em;
     font-weight: bold;
     color: #007bff;
+    display: flex; /* جديد: للمحاذاة */
+    align-items: center; /* جديد: للمحاذاة */
+    gap: 10px; /* جديد: لترك مسافة بين الأيقونة والنص */
+}
+
+/* --- تنسيق جديد للأيقونة --- */
+.logo-icon {
+    height: 40px; /* يمكنك تعديل الحجم */
+    width: 40px;
 }
 
 .nav-links {
@@ -50,11 +60,81 @@ body {
 
 /* قسم الألعاب المميزة (Placeholder) */
 .featured-banner {
-    padding: 30px;
+    padding: 0; /* أزلنا الحشو القديم لتمتد الصورة */
     text-align: center;
     background-color: #2a2a2a;
     margin: 20px;
     border-radius: 10px;
+    overflow: hidden; /* لإخفاء زوائد الصورة */
+    position: relative; /* لجعل النص يطفو فوق الصورة */
+}
+
+/* --- (جديد) رابط البانر --- */
+.featured-link {
+    display: block;
+    text-decoration: none;
+    color: #f0f0f0;
+}
+
+/* --- (جديد) صورة البانر --- */
+.featured-banner img {
+    width: 100%;
+    height: 350px; /* ارتفاع ثابت للبانر */
+    object-fit: cover; /* لملء المساحة دون تشويه */
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.featured-link:hover img {
+    transform: scale(1.05); /* تأثير زووم عند التمرير */
+}
+
+/* --- (جديد) صندوق المعلومات فوق الصورة --- */
+.featured-info {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0)); /* تدرج أسود شفاف */
+    box-sizing: border-box; /* ليتم حساب البادينج ضمن العرض */
+    text-align: right;
+}
+
+.featured-info h2 {
+    margin: 0 0 10px 0;
+    font-size: 2.2em;
+    color: #0099ff;
+}
+
+.featured-info p {
+    margin: 0 0 15px 0;
+    font-size: 1.1em;
+}
+
+.featured-info span {
+    font-weight: bold;
+    color: #ffd700;
+}
+
+
+/* ... (باقي تنسيقاتك) ... */
+
+
+/* تعديل للشاشات الصغيرة */
+@media (max-width: 768px) {
+    /* ... (تنسيقاتك الموجودة) ... */
+    
+    .featured-banner img {
+        height: 250px; /* ارتفاع أقل للشاشات الصغيرة */
+    }
+
+    .featured-info h2 {
+        font-size: 1.8em;
+    }
+    .featured-info p {
+        font-size: 1em;
+    }
 }
 
 /* تنسيق شريط الفلاتر */
@@ -149,11 +229,11 @@ body {
 .price {
     font-weight: bold;
     font-size: 1.1em;
-    color: #50e3c2; /* لون للسعر */
+    color: #ffd700; /* --- تم التعديل إلى اللون الذهبي --- */
 }
 
 .rating {
-    color: #ffc107; /* لون النجوم */
+    color: #ffd700; /* --- تم التعديل إلى اللون الذهبي --- */
 }
 
 /* --- تنسيقات صفحة التفاصيل (game.html) --- */
@@ -212,17 +292,18 @@ body {
     font-size: 1.8em;
     display: block;
     margin-bottom: 20px;
-    color: #50e3c2;
+    color: #ffd700; /* --- تم التعديل إلى اللون الذهبي --- */
 }
 
+/* --- تم تصغير الزر قليلاً --- */
 .download-button {
     display: block;
     width: 100%;
-    padding: 15px;
+    padding: 12px; /* تصغير الحشو */
     background-color: #007bff; /* لون أزرق مميز */
     color: #ffffff;
     text-decoration: none;
-    font-size: 1.3em;
+    font-size: 1.2em; /* تصغير الخط */
     font-weight: bold;
     text-align: center;
     border-radius: 8px;
@@ -284,19 +365,20 @@ body {
     transition: color 0.2s;
 }
 
+/* --- تم تعديل اللون الذهبي هنا --- */
 .star-rating:hover span {
-    color: #ffc107;
+    color: #ffd700;
 }
 
 .star-rating span:hover ~ span {
-    color: #ffc107;
+    color: #ffd700;
 }
 
 .star-rating span.selected {
-    color: #ffc107;
+    color: #ffd700;
 }
 .star-rating span.selected ~ span {
-    color: #ffc107;
+    color: #ffd700;
 }
 
 .comment-item {
@@ -319,8 +401,9 @@ body {
     color: #eee;
 }
 
+/* --- تم تعديل اللون الذهبي هنا --- */
 .comment-rating {
-    color: #ffc107;
+    color: #ffd700;
     font-size: 1.1em;
 }
 
