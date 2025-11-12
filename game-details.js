@@ -12,7 +12,7 @@ const gamesDB = [
     coverImage: "images/coverImage/1.webp",
     screenshots: ["images/screenshots/1/1.webp", "images/screenshots/1/2.webp"],
     description: "لعبة مغامرات مثيرة في عالم مفتوح لاستكشاف الأراضي المجهولة ومحاربة الوحوش.",
-    downloadUrl: "downloads/The_Hoided_Driver3.apk.zip", 
+    downloadUrl: "nitro.zip", 
     comments: [
         { author: "لاعب_محترف", rating: 5, text: "لعبة رائعة! الجرافيكس مذهل." },
         { author: "مستخدم_جديد", rating: 4, text: "جيدة جداً، لكنها صعبة قليلاً." }
