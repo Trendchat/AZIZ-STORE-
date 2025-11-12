@@ -1,62 +1,81 @@
-// استيراد قاعدة البيانات من ملف الإعداد الجديد
-import { db, getDocs, collection } from './firebase-init.js';
+// 1. "قاعدة البيانات" المؤقتة (تم إضافة "description")
+const gamesDB = [
+  {
+    id: 1,
+    title: "مغامرة البطل",
+    developer: "Studio X",
+    genre: "مغامرات",
+    price: "مجاني",
+    rating: 4.5,
+    coverImage: "images/coverImage/1.webp",
+    description: "لعبة مغامرات مثيرة في عالم مفتوح لاستكشاف الأراضي المجهولة." // <-- وصف مضاف
+  },
+  {
+    id: 2,
+    title: "سباق الصحراء",
+    developer: "Speed Inc.",
+    genre: "سباقات",
+    price: "$9.99",
+    rating: 4.2,
+    coverImage: "images/coverImage/2.webp",
+    description: "تحدى الجاذبية في سباقات سريعة عبر الكثبان الرملية." // <-- وصف مضاف
+  },
+  {
+    id: 3,
+    title: "لغز الفضاء",
+    developer: "Mind Games",
+    genre: "ألغاز",
+    price: "$4.99",
+    rating: 4.8,
+    coverImage: "images/coverImage/3.webp",
+    description: "حل ألغاز معقدة في بيئة فضائية مذهلة." // <-- وصف مضاف
+  },
+  {
+    id: 4,
+    title: "حرب النجوم",
+    developer: "Galaxy Dev",
+    genre: "أكشن",
+    price: "$19.99",
+    rating: 4.0,
+    coverImage: "images/coverImage/4.webp",
+    description: "قتال فضائي ملحمي للسيطرة على المجرة." // <-- وصف مضاف
+  }
+];
 
-let allGames = []; // سيتم تخزين الألعاب من فايرستور هنا
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
     
     const gameGrid = document.getElementById("game-grid");
     const searchInput = document.getElementById("searchInput");
     const filterButtons = document.querySelectorAll(".filter-btn");
+
+    // --- (جديد) كود عرض اللعبة المميزة ---
     const featuredBanner = document.querySelector(".featured-banner");
     
-    // مؤشر تحميل مؤقت
-    gameGrid.innerHTML = "<p>يتم تحميل الألعاب من قاعدة البيانات...</p>";
-
-    // --- (جديد) جلب الألعاب من Firestore ---
-    async function fetchAndDisplayGames() {
-        try {
-            // جلب مستندات الألعاب من مجموعة "games"
-            const querySnapshot = await getDocs(collection(db, "games"));
-            // تحويل البيانات + إضافة ID المستند
-            allGames = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
-            if (allGames.length === 0) {
-                gameGrid.innerHTML = "<p>لم يتم العثور على ألعاب. يرجى إضافتها في لوحة تحكم Firestore.</p>";
-            } else {
-                displayGames(allGames);
-                // تحديث اللعبة المميزة بعد جلب البيانات
-                setupFeaturedGame();
-            }
-        } catch (error) {
-            console.error("Error fetching games: ", error);
-            gameGrid.innerHTML = "<p>حدث خطأ أثناء تحميل الألعاب. تأكد من إعدادات الأمان في Firestore.</p>";
-        }
+    // لنفترض أن اللعبة المميزة هي دائماً أول لعبة (id: 1)
+    const featuredGame = gamesDB.find(game => game.id === 1); 
+    
+    if (featuredGame) {
+        // استخدمنا مسار "momiz" الذي طلبته
+        const featuredHTML = `
+            <a href="game.html?id=${featuredGame.id}" class="featured-link">
+                <img src="images/momiz/1.webp" alt="${featuredGame.title}">
+                <div class="featured-info">
+                    <h2>${featuredGame.title}</h2>
+                    <p>${featuredGame.description}</p>
+                    <span>اكتشف المزيد...</span>
+                </div>
+            </a>
+        `;
+        // قمنا بإزالة العنوان "اللعبة المميزة" من HTML واعتمدنا هذا الكود
+        featuredBanner.innerHTML = featuredHTML;
     }
+    // --- نهاية الكود الجديد ---
 
-    // (جديد) دالة لإعداد اللعبة المميزة (بنفس المنطق القديم)
-    function setupFeaturedGame() {
-        // البحث عن اللعبة التي لها ID "1" (كما في الكود الأصلي)
-        const featuredGame = allGames.find(game => game.id === '1'); 
-        
-        if (featuredGame && featuredBanner) {
-            // استخدام المسار الأصلي للعبة المميزة "momiz"
-            const featuredHTML = `
-                <a href="game.html?id=${featuredGame.id}" class="featured-link">
-                    <img src="images/momiz/1.webp" alt="${featuredGame.title}">
-                    <div class="featured-info">
-                        <h2>${featuredGame.title}</h2>
-                        <p>${featuredGame.description}</p>
-                        <span>اكتشف المزيد...</span>
-                    </div>
-                </a>
-            `;
-            featuredBanner.innerHTML = featuredHTML;
-        }
-    }
 
-    // دالة عرض الألعاب (معدلة لتستخدم بيانات Firestore)
+    // دالة عرض الألعاب
     function displayGames(gamesList) {
+        // ... (باقي الكود كما هو) ...
         gameGrid.innerHTML = "";
         
         if (gamesList.length === 0) {
@@ -74,7 +93,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             <p>المطور: ${game.developer}</p>
                             <div class="game-card-footer">
                                 <span class="price">${game.price}</span>
-                                <span class="rating">⭐ ${game.rating || 0}</span>
+                                <span class="rating">⭐ ${game.rating}</span>
                             </div>
                         </div>
                     </div>
@@ -84,21 +103,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // جلب الألعاب عند التحميل
-    fetchAndDisplayGames();
+    // عرض جميع الألعاب عند التحميل
+    displayGames(gamesDB);
 
-    // تفعيل البحث (يعمل على allGames التي تم جلبها)
+    // تفعيل البحث
     searchInput.addEventListener("keyup", (event) => {
         const searchTerm = event.target.value.toLowerCase();
         
-        const filteredGames = allGames.filter(game => {
+        const filteredGames = gamesDB.filter(game => {
             return game.title.toLowerCase().includes(searchTerm);
         });
         
         displayGames(filteredGames);
     });
 
-    // تفعيل الفلاتر (يعمل على allGames التي تم جلبها)
+    // تفعيل الفلاتر
     filterButtons.forEach(button => {
         button.addEventListener("click", () => {
             
@@ -109,11 +128,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             let filteredGames = [];
 
             if (filterValue === "all") {
-                filteredGames = allGames;
+                filteredGames = gamesDB;
             } else if (filterValue === "free") {
-                filteredGames = allGames.filter(game => game.price.toLowerCase() === "مجاني");
+                filteredGames = gamesDB.filter(game => game.price.toLowerCase() === "مجاني");
             } else {
-                filteredGames = allGames.filter(game => game.genre === filterValue);
+                filteredGames = gamesDB.filter(game => game.genre === filterValue);
             }
             
             displayGames(filteredGames);
