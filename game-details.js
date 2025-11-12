@@ -12,7 +12,7 @@ const gamesDB = [
     coverImage: "images/coverImage/1.webp",
     screenshots: ["images/screenshots/1/1.webp", "images/screenshots/1/2.webp"],
     description: "لعبة مغامرات مثيرة في عالم مفتوح لاستكشاف الأراضي المجهولة ومحاربة الوحوش.",
-    downloadUrl: "nitro.zip", 
+    downloadUrl: "downloads/The_Hoided_Driver3.apk.zip", 
     comments: [
         { author: "لاعب_محترف", rating: 5, text: "لعبة رائعة! الجرافيكس مذهل." },
         { author: "مستخدم_جديد", rating: 4, text: "جيدة جداً، لكنها صعبة قليلاً." }
@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // (ب) دالة لجلب العداد عند تحميل الصفحة
         function getDownloadCount() {
-            fetch(`https://api.countapi.xyz/get/${countNamespace}/${countKey}`)
+            fetch(`https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/azizstore-1`)
                 .then(response => response.json())
                 .then(data => {
                     downloadCountSpan.textContent = data.value || 0; // عرض القيمة أو 0
