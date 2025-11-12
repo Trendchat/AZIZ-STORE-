@@ -1,70 +1,84 @@
-// استيراد كل ما نحتاجه من ملف الإعداد
-import { 
-  db, 
-  analytics,
-  auth,
-  currentUserId,
-  logEvent,
-  getDoc, 
-  doc, 
-  setDoc,
-  addDoc,
-  collection,
-  increment,
-  onSnapshot,
-  serverTimestamp,
-  query,
-  orderBy,
-  runTransaction
-} from './firebase-init.js';
+// (هذا ملف game-details.js المحدث)
 
+// 1. "قاعدة البيانات" (تم إضافة "downloadUrl" لكل لعبة)
+const gamesDB = [
+  {
+    id: 1,
+    title: "مغامرة البطل",
+    developer: "Studio X",
+    genre: "مغامرات",
+    price: "مجاني",
+    rating: 4.5,
+    coverImage: "images/coverImage/1.webp",
+    screenshots: ["images/screenshots/1/1.webp", "images/screenshots/1/2.webp"],
+    description: "لعبة مغامرات مثيرة في عالم مفتوح لاستكشاف الأراضي المجهولة ومحاربة الوحوش.",
+    downloadUrl: "nitro.zip", 
+    comments: [
+        { author: "لاعب_محترف", rating: 5, text: "لعبة رائعة! الجرافيكس مذهل." },
+        { author: "مستخدم_جديد", rating: 4, text: "جيدة جداً، لكنها صعبة قليلاً." }
+    ]
+  },
+  {
+    id: 2,
+    title: "سباق الصحراء",
+    developer: "Speed Inc.",
+    genre: "سباقات",
+    price: "$9.99",
+    rating: 4.2,
+    coverImage: "images/coverImage/2.webp",
+    screenshots: ["images/screenshots/2/1.webp"],
+    description: "تحدى الجاذبية في سباقات سريعة عبر الكثبان الرملية.",
+    downloadUrl: "downloads/desert_race.zip", 
+    comments: [
+        { author: "متسابق1", rating: 4, text: "أفضل لعبة سباق لعبتها هذا العام." }
+    ]
+  },
+  {
+    id: 3,
+    title: "لغز الفضاء",
+    developer: "Mind Games",
+    genre: "ألغاز",
+    price: "$4.99",
+    rating: 4.8,
+    coverImage: "images/coverImage/3.webp",
+    screenshots: ["images/screenshots/3/1.webp"],
+    description: "حل ألغاز معقدة في بيئة فضائية مذهلة.",
+    downloadUrl: "downloads/space_puzzle.zip", 
+    comments: []
+  },
+  {
+    id: 4,
+    title: "حرب النجوم",
+    developer: "Galaxy Dev",
+    genre: "أكشن",
+    price: "$19.99",
+    rating: 4.0,
+    coverImage: "images/coverImage/4.webp",
+    screenshots: ["images/screenshots/4/1.webp"],
+    description: "قتال فضائي ملحمي للسيطرة على المجرة.",
+    downloadUrl: "downloads/star_wars.zip", 
+    comments: []
+  }
+];
+
+// انتظر تحميل الصفحة
 document.addEventListener("DOMContentLoaded", () => {
     
     // قراءة "معرّف اللعبة" (ID) من الرابط (URL)
     const urlParams = new URLSearchParams(window.location.search);
     const gameId = urlParams.get('id');
 
+    // البحث عن اللعبة في "قاعدة البيانات"
+    const game = gamesDB.find(g => g.id == gameId);
+
+    // الحصول على الحاوية الرئيسية
     const container = document.getElementById("game-detail-container");
 
-    if (!gameId) {
-        container.innerHTML = "<h1>عذراً، لم يتم تحديد لعبة.</h1>";
-        return;
-    }
+    if (game) {
+        // إذا تم العثور على اللعبة، قم بملء الصفحة
+        document.title = `${game.title} - AZIZ STORE`; // تحديث عنوان الصفحة
 
-    // (جديد) مرجع للمستند في Firestore
-    const gameDocRef = doc(db, "games", gameId);
-
-    // --- (جديد) جلب بيانات اللعبة من Firestore ---
-    async function fetchGameDetails() {
-        try {
-            container.innerHTML = "<h1>جاري تحميل بيانات اللعبة...</h1>";
-            const docSnap = await getDoc(gameDocRef);
-
-            if (docSnap.exists()) {
-                const game = docSnap.data();
-                displayGameData(game); // عرض بيانات اللعبة
-
-                // (جديد) تسجيل مشاهدة الصفحة للتحليلات
-                logEvent(analytics, 'view_item', {
-                    item_id: gameId,
-                    item_name: game.title,
-                    item_category: game.genre
-                });
-
-            } else {
-                container.innerHTML = "<h1>عذراً، لم يتم العثور على اللعبة.</h1>";
-            }
-        } catch (error) {
-            console.error("Error fetching game details: ", error);
-            container.innerHTML = "<h1>عذراً، حدث خطأ أثناء تحميل بيانات اللعبة.</h1>";
-        }
-    }
-
-    // --- (جديد) دالة لملء الصفحة بالبيانات (مبنية على الكود الأصلي) ---
-    function displayGameData(game) {
-        document.title = `${game.title} - AZIZ STORE`; 
-
-        // نفس الـ HTML من ملفك الأصلي مع تعديلات طفيفة
+        // إنشاء كود HTML الديناميكي
         const gameDetailHTML = `
             <h1>${game.title}</h1>
             <div class="game-detail-layout">
@@ -79,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <ul class="game-metadata">
                         <li><strong>المطور:</strong> <span id="game-developer">${game.developer}</span></li>
                         <li><strong>التصنيف:</strong> <span id="game-genre">${game.genre}</span></li>
-                        <li><strong>التقييم:</strong> <span id="game-rating">⭐ ${game.rating || 0} (${game.ratingCount || 0} تقييمات)</span></li>
+                        <li><strong>التقييم:</strong> <span id="game-rating">⭐ ${game.rating}</span></li>
                     </ul>
                     
                     <div class="purchase-box">
@@ -87,8 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         <a href="${game.downloadUrl}" id="download-button" class="download-button" download>
                             تنزيل الآن
                         </a>
-                        <p class="download-counter" style="color: #ccc; margin-top: 10px;">
-                            مرات التنزيل: ${game.downloadCount || 0}
+                        <p style="text-align: center; margin-top: 10px; color: #ccc;">
+                            <span id="download-count">...</span> تنزيلات
                         </p>
                     </div>
                 </div>
@@ -108,198 +122,158 @@ document.addEventListener("DOMContentLoaded", () => {
                         <input type="hidden" id="star-rating-value" value="0">
                         <textarea id="comment-text" rows="5" placeholder="اكتب تعليقك هنا..." required></textarea>
                         <button type="submit" class="download-button">إرسال التقييم</button>
-                        <p id="review-message" class="review-message" style="display: none;"></p>
                     </form>
                 </div>
                 
                 <div class="comments-list-container">
                     <h3>التعليقات</h3>
                     <div id="comments-list">
-                        <p>يتم تحميل التعليقات...</p>
-                    </div>
+                        </div>
                 </div>
             </section>
         `;
         
         container.innerHTML = gameDetailHTML;
-
-        // --- تفعيل الوظائف الإضافية بعد تحميل المحتوى ---
-        activateDownloadButton(game.downloadUrl);
-        activateReviewForm(); // تفعيل نظام النجوم والإرسال
-        listenForComments(); // بدء الاستماع للتعليقات
-    }
-
-    // --- (جديد) تفعيل زر التنزيل (لتسجيل التحليلات وعدد التنزيلات) ---
-    function activateDownloadButton(downloadUrl) {
-        const downloadButton = document.getElementById("download-button");
-        downloadButton.addEventListener("click", async (event) => {
-            event.preventDefault(); // منع التحميل الفوري
-
-            // 1. تسجيل التحليلات
-            logEvent(analytics, 'select_content', {
-                content_type: 'game_download',
-                item_id: gameId
-            });
-
-            // 2. تحديث عدد التنزيلات في Firestore
-            try {
-                // استخدام setDoc مع merge + increment لتحديث العداد أو إنشائه
-                await setDoc(gameDocRef, { 
-                    downloadCount: increment(1) 
-                }, { merge: true });
-
-            } catch (error) {
-                console.error("Error updating download count: ", error);
-            }
-
-            // 3. بدء التحميل يدوياً
-            window.location.href = downloadUrl;
-        });
-    }
-
-    // --- (جديد) تفعيل نظام النجوم ونموذج الإرسال (لحفظ التقييمات في Firestore) ---
-    function activateReviewForm() {
-        const reviewForm = document.getElementById("review-form");
-        if (!reviewForm) return;
         
-        const stars = reviewForm.querySelectorAll(".star-rating span");
-        const ratingValueInput = reviewForm.querySelector("#star-rating-value");
-        const commentText = reviewForm.querySelector("#comment-text");
-        const submitButton = reviewForm.querySelector("button");
-        const messageEl = reviewForm.querySelector("#review-message");
+        // --- تفعيل الوظائف الإضافية بعد تحميل المحتوى ---
 
-        // تفعيل النجوم (بنفس منطق الكود الأصلي)
+        // 1. عرض التعليقات الموجودة
+        const commentsList = document.getElementById("comments-list");
+        displayComments(game.comments || []);
+
+        // 2. تفعيل نظام النجوم
+        const stars = document.querySelectorAll(".star-rating span");
+        const ratingValueInput = document.getElementById("star-rating-value");
+
         stars.forEach(star => {
             star.addEventListener("click", () => {
                 const value = star.getAttribute("data-value");
                 ratingValueInput.value = value;
                 
                 stars.forEach(s => s.classList.remove("selected"));
-                for (let i = 0; i < value; i++) {
-                    // الترتيب معكوس في HTML (من 5 إلى 1)
-                    stars[4 - i].classList.add("selected");
+                star.classList.add("selected");
+                let current = star;
+                while(current.nextElementSibling) {
+                    current.nextElementSibling.classList.add("selected");
+                    current = current.nextElementSibling;
                 }
             });
         });
 
-        // تفعيل إرسال النموذج (جديد)
-        reviewForm.addEventListener("submit", async (event) => {
+        // 3. تفعيل نموذج إرسال التعليق
+        const reviewForm = document.getElementById("review-form");
+        reviewForm.addEventListener("submit", (event) => {
             event.preventDefault(); 
+
+            const userRating = ratingValueInput.value;
+            const userComment = document.getElementById("comment-text").value;
+
+            if (userRating == "0") {
+                alert("يرجى اختيار تقييم (النجوم) أولاً.");
+                return;
+            }
             
-            if (!auth.currentUser) {
-                showMessage("حدث خطأ في المصادقة. يرجى إعادة تحميل الصفحة.", "error");
-                return;
-            }
-
-            const userRating = parseInt(ratingValueInput.value);
-            const userComment = commentText.value;
-
-            if (userRating === 0) {
-                showMessage("يرجى اختيار تقييم (النجوم) أولاً.", "error");
-                return;
-            }
-
-            submitButton.disabled = true;
-            showMessage("جاري إرسال التقييم...", "info");
-
             const newComment = {
-                authorId: auth.currentUser.uid,
-                author: "مستخدم", // يمكنك تغييره لاحقاً
-                rating: userRating,
-                text: userComment,
-                createdAt: serverTimestamp() // استخدام وقت السيرفر
+                author: "أنت (مستخدم حالي)",
+                rating: parseInt(userRating),
+                text: userComment
             };
 
-            try {
-                // (جديد) استخدام Transaction لتحديث التقييم وإضافة التعليق
-                await runTransaction(db, async (transaction) => {
-                    const gameDoc = await transaction.get(gameDocRef);
-                    if (!gameDoc.exists()) {
-                        throw "Game document does not exist!";
-                    }
+            displayComment(newComment, commentsList, true);
 
-                    const gameData = gameDoc.data();
-                    const oldRatingCount = gameData.ratingCount || 0;
-                    const oldRatingSum = gameData.totalRatingSum || 0; 
+            reviewForm.reset();
+            stars.forEach(s => s.classList.remove("selected"));
+            ratingValueInput.value = "0";
+        });
+        
+        // --- (جديد) كود تتبع التنزيلات ---
 
-                    const newRatingCount = oldRatingCount + 1;
-                    const newRatingSum = oldRatingSum + userRating;
-                    const newAverageRating = (newRatingSum / newRatingCount).toFixed(1);
+        // (أ) تعريف العدادات
+        const countNamespace = "azizstore"; // يمكنك تغييره لأي اسم (مثل اسم متجرك)
+        const countKey = `game-${game.id}`; // مفتاح فريد لكل لعبة
+        const downloadButton = document.getElementById("download-button");
+        const downloadUrl = downloadButton.href;
+        const downloadCountSpan = document.getElementById("download-count");
 
-                    // 1. تحديث مستند اللعبة الرئيسي
-                    transaction.update(gameDocRef, {
-                        ratingCount: newRatingCount,
-                        totalRatingSum: newRatingSum,
-                        rating: parseFloat(newAverageRating)
-                    });
-
-                    // 2. إضافة مستند التعليق الجديد
-                    const newCommentRef = doc(collection(db, "games", gameId, "comments"));
-                    transaction.set(newCommentRef, newComment);
+        // (ب) دالة لجلب العداد عند تحميل الصفحة
+        function getDownloadCount() {
+            fetch(`https://api.countapi.xyz/get/${countNamespace}/${countKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    downloadCountSpan.textContent = data.value || 0; // عرض القيمة أو 0
+                })
+                .catch(error => {
+                    console.error("خطأ في جلب العداد:", error);
+                    downloadCountSpan.textContent = "N/A";
                 });
-
-                showMessage("تم إرسال التقييم بنجاح!", "success");
-                reviewForm.reset();
-                stars.forEach(s => s.classList.remove("selected"));
-                ratingValueInput.value = "0";
-
-            } catch (error) {
-                console.error("Error submitting review: ", error);
-                showMessage("حدث خطأ أثناء إرسال التقييم.", "error");
-            } finally {
-                submitButton.disabled = false;
-            }
-        });
-
-        function showMessage(text, type) {
-            messageEl.textContent = text;
-            messageEl.style.color = type === 'error' ? 'red' : (type === 'success' ? 'green' : 'white');
-            messageEl.style.display = 'block';
-            
-            setTimeout(() => { 
-                if (messageEl.textContent === text) {
-                   messageEl.style.display = 'none'; 
-                }
-            }, 4000);
         }
+
+        // (ج) دالة لزيادة العداد عند الضغط
+        function incrementDownloadCount(event) {
+            // 1. منع التنزيل الفوري
+            event.preventDefault(); 
+            
+            downloadButton.textContent = "جاري التحضير...";
+            downloadButton.disabled = true;
+
+            // 2. إرسال طلب لزيادة العداد
+            fetch(`https://api.countapi.xyz/hit/${countNamespace}/${countKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    // 3. تحديث الرقم في الصفحة
+                    downloadCountSpan.textContent = data.value;
+                    console.log(`تم تسجيل التنزيل! العدد الإجمالي: ${data.value}`);
+                })
+                .catch(error => {
+                    console.error("خطأ في تحديث العداد:", error);
+                })
+                .finally(() => {
+                    // 4. سواء نجح العداد أم لا، ابدأ التنزيل
+                    window.location.href = downloadUrl;
+                    downloadButton.textContent = "تنزيل الآن";
+                    downloadButton.disabled = false;
+                });
+        }
+
+        // (د) تفعيل الوظائف
+        getDownloadCount(); // جلب العداد عند فتح الصفحة
+        downloadButton.addEventListener("click", incrementDownloadCount); // تفعيل الزر
+
+        // --- نهاية كود تتبع التنزيلات ---
+
+
+    } else {
+        container.innerHTML = "<h1>عذراً، لم يتم العثور على اللعبة.</h1>";
     }
+});
 
-    // --- (جديد) الاستماع للتعليقات من Firestore (عرض فوري) ---
-    function listenForComments() {
-        const commentsListEl = document.getElementById("comments-list");
-        const commentsQuery = query(collection(db, "games", gameId, "comments"), orderBy("createdAt", "desc"));
-
-        onSnapshot(commentsQuery, (snapshot) => {
-            if (snapshot.empty) {
-                commentsListEl.innerHTML = "<p>لا توجد تعليقات حتى الآن. كن أول من يعلق!</p>";
-                return;
-            }
-
-            commentsListEl.innerHTML = ""; // مسح القائمة قبل إعادة العرض
-            snapshot.docs.forEach(doc => {
-                const comment = doc.data();
-                displayComment(comment, commentsListEl); // استخدام دالتك القديمة
-            });
-        }, (error) => {
-            console.error("Error listening for comments: ", error);
-            commentsListEl.innerHTML = "<p>حدث خطأ أثناء تحميل التعليقات.</p>";
-        });
+// دالة منفصلة لعرض قائمة التعليقات
+function displayComments(commentsArray) {
+    const commentsList = document.getElementById("comments-list");
+    commentsList.innerHTML = ""; 
+    if(commentsArray.length === 0) {
+        commentsList.innerHTML = "<p>لا توجد تعليقات حتى الآن. كن أول من يعلق!</p>";
+        return;
     }
+    commentsArray.forEach(comment => {
+        displayComment(comment, commentsList, false);
+    });
+}
 
-    // --- دالة عرض تعليق واحد (من الكود الأصلي) ---
-    function displayComment(comment, listElement) {
-        const commentHTML = `
-            <div class="comment-item">
-                <div class="comment-header">
-                    <span class="comment-author">${comment.author}</span>
-                    <span class="comment-rating">${"⭐".repeat(comment.rating)}</span>
-                </div>
-                <p class="comment-body">${comment.text}</p>
+// دالة لعرض تعليق واحد
+function displayComment(comment, listElement, addToTop) {
+    const commentHTML = `
+        <div class="comment-item">
+            <div class="comment-header">
+                <span class="comment-author">${comment.author}</span>
+                <span class="comment-rating">${"⭐".repeat(comment.rating)}</span>
             </div>
-        `;
+            <p class="comment-body">${comment.text}</p>
+        </div>
+    `;
+    if (addToTop) {
+        listElement.innerHTML = commentHTML + listElement.innerHTML;
+    } else {
         listElement.innerHTML += commentHTML;
     }
-
-    // --- بدء العملية ---
-    fetchGameDetails(); // ابدأ بجلب بيانات اللعبة
-});
+}
