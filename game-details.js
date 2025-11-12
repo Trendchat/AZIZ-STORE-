@@ -197,7 +197,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // (ب) دالة لجلب العداد عند تحميل الصفحة
         function getDownloadCount() {
-            fetch(`https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/azizstore-1`)
+            fetch(`https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/1game/up \
+  -H "Authorization: Bearer ut_dDfcrrl9r2mg6ZJSQzLurHj82LehXkWQtDplIbrY"`)
                 .then(response => response.json())
                 .then(data => {
                     downloadCountSpan.textContent = data.value || 0; // عرض القيمة أو 0
@@ -217,7 +218,8 @@ document.addEventListener("DOMContentLoaded", () => {
             downloadButton.disabled = true;
 
             // 2. إرسال طلب لزيادة العداد
-            fetch(`https://api.countapi.xyz/hit/${countNamespace}/${countKey}`)
+            fetch(`https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/1game/up \
+  -H "Authorization: Bearer ut_dDfcrrl9r2mg6ZJSQzLurHj82LehXkWQtDplIbrY"`)
                 .then(response => response.json())
                 .then(data => {
                     // 3. تحديث الرقم في الصفحة
