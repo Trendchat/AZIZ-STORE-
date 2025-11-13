@@ -79,7 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.title = `${game.title} - AZIZ STORE`; // تحديث عنوان الصفحة
 
         // إنشاء كود HTML الديناميكي
-        // (*** تم إضافة العنصر <span id="download-count-display"> ***)
         const gameDetailHTML = `
             <h1>${game.title}</h1>
             <div class="game-detail-layout">
@@ -144,7 +143,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const countDisplayElement = document.getElementById("download-count-display");
         
         // --- (ب) جلب العداد الحالي عند تحميل الصفحة ---
-        const getCountUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}/`;
+        
+        // (*** هذا هو السطر الذي تم تصحيحه ***)
+        // تم إزالة علامة / الزائدة من نهاية الرابط
+        const getCountUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}`;
+        
         countDisplayElement.textContent = "جارٍ التحميل..."; // نص مؤقت
 
         fetch(getCountUrl)
@@ -161,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const downloadButton = document.getElementById("download-button");
         if (downloadButton) {
             downloadButton.addEventListener("click", () => {
-                // هذا هو رابط الزيادة "up"
+                // هذا هو رابط الزيادة "up" (وهو صحيح)
                 const upUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}/up`;
 
                 fetch(upUrl)
