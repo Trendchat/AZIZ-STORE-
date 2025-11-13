@@ -190,15 +190,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // (أ) تعريف العدادات
         const countNamespace = "azizstore"; // يمكنك تغييره لأي اسم (مثل اسم متجرك)
-        const countKey = `game-${game.id}`; // مفتاح فريد لكل لعبة
+        const countKey = azizstore-1; // مفتاح فريد لكل لعبة
         const downloadButton = document.getElementById("download-button");
         const downloadUrl = downloadButton.href;
         const downloadCountSpan = document.getElementById("download-count");
 
         // (ب) دالة لجلب العداد عند تحميل الصفحة
         function getDownloadCount() {
-            fetch(`https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/1game/up \
-  -H "Authorization: Bearer ut_dDfcrrl9r2mg6ZJSQzLurHj82LehXkWQtDplIbrY"`)
+            fetch(`https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/azizstore-1`)
                 .then(response => response.json())
                 .then(data => {
                     downloadCountSpan.textContent = data.value || 0; // عرض القيمة أو 0
@@ -218,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
             downloadButton.disabled = true;
 
             // 2. إرسال طلب لزيادة العداد
-            fetch(`https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/1game/up \
+            fetch(`https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/azizstore-1/up \
   -H "Authorization: Bearer ut_dDfcrrl9r2mg6ZJSQzLurHj82LehXkWQtDplIbrY"`)
                 .then(response => response.json())
                 .then(data => {
