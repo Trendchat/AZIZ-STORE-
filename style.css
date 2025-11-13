@@ -438,3 +438,11 @@ footer {
         grid-template-columns: 1fr;
     }
 }
+/* تنسيق لعدد التنزيلات تحت الزر */
+.download-count {
+  display: block; /* يجعله يظهر في سطر جديد تحت الزر */
+  margin-top: 8px;
+  font-size: 0.9em;
+  color: #888;
+  text-align: center; /* يجعله متوافقاً مع الزر (إذا كان الزر في الوسط) */
+}
