@@ -1,6 +1,6 @@
 // (هذا ملف game-details.js المحدث)
 
-// 1. "قاعدة البيانات" (تم إضافة "downloadUrl" لكل لعبة)
+// 1. "قاعدة البيانات"
 const gamesDB = [
   {
     id: 1,
@@ -9,8 +9,8 @@ const gamesDB = [
     genre: "مغامرات",
     price: "مجاني",
     rating: 4.5,
-    coverImage: "images/coverImage/1.webp", // <-- تم التغيير
-    screenshots: ["images/screenshots/1/1.webp", "images/screenshots/1/2.webp"], // <-- تم التغيير
+    coverImage: "images/coverImage/1.webp",
+    screenshots: ["images/screenshots/1/1.webp", "images/screenshots/1/2.webp"],
     description: "لعبة مغامرات مثيرة في عالم مفتوح لاستكشاف الأراضي المجهولة ومحاربة الوحوش.",
     downloadUrl: "nitro.zip", 
     comments: [
@@ -25,8 +25,8 @@ const gamesDB = [
     genre: "سباقات",
     price: "$9.99",
     rating: 4.2,
-    coverImage: "images/coverImage/2.webp", // <-- تم التغيير
-    screenshots: ["images/screenshots/2/1.webp"], // <-- تم التغيير
+    coverImage: "images/coverImage/2.webp",
+    screenshots: ["images/screenshots/2/1.webp"],
     description: "تحدى الجاذبية في سباقات سريعة عبر الكثبان الرملية.",
     downloadUrl: "downloads/desert_race.zip", 
     comments: [
@@ -40,8 +40,8 @@ const gamesDB = [
     genre: "ألغاز",
     price: "$4.99",
     rating: 4.8,
-    coverImage: "images/coverImage/3.webp", // <-- تم التغيير
-    screenshots: ["images/screenshots/3/1.webp"], // <-- تم التغيير
+    coverImage: "images/coverImage/3.webp",
+    screenshots: ["images/screenshots/3/1.webp"],
     description: "حل ألغاز معقدة في بيئة فضائية مذهلة.",
     downloadUrl: "downloads/space_puzzle.zip", 
     comments: []
@@ -53,8 +53,8 @@ const gamesDB = [
     genre: "أكشن",
     price: "$19.99",
     rating: 4.0,
-    coverImage: "images/coverImage/4.webp", // <-- تم التغيير
-    screenshots: ["images/screenshots/4/1.webp"], // <-- تم التغيير
+    coverImage: "images/coverImage/4.webp",
+    screenshots: ["images/screenshots/4/1.webp"],
     description: "قتال فضائي ملحمي للسيطرة على المجرة.",
     downloadUrl: "downloads/star_wars.zip", 
     comments: []
@@ -79,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.title = `${game.title} - AZIZ STORE`; // تحديث عنوان الصفحة
 
         // إنشاء كود HTML الديناميكي
+        // (*** تم إضافة العنصر <span id="download-count-display"> ***)
         const gameDetailHTML = `
             <h1>${game.title}</h1>
             <div class="game-detail-layout">
@@ -101,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <a href="${game.downloadUrl}" id="download-button" class="download-button" download>
                             تنزيل الآن
                         </a>
+                        <span id="download-count-display" class="download-count">...</span>
                     </div>
                 </div>
             </div>
@@ -134,28 +136,50 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // --- تفعيل الوظائف الإضافية بعد تحميل المحتوى ---
 
-        // 0. تفعيل عداد التنزيلات (الكود المضاف)
+        // 0. تفعيل عداد التنزيلات (الكود المحدث)
+        
+        // --- (أ) إعدادات العداد ---
+        const namespace = "abdulaziz-alshargis-team-1656";
+        const gameKey = `game-${game.id}`; // استخدام المفتاح الجديد مثل: "game-1", "game-2"
+        const countDisplayElement = document.getElementById("download-count-display");
+        
+        // --- (ب) جلب العداد الحالي عند تحميل الصفحة ---
+        const getCountUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}/`;
+        countDisplayElement.textContent = "جارٍ التحميل..."; // نص مؤقت
+
+        fetch(getCountUrl)
+            .then(response => response.json())
+            .then(data => {
+                countDisplayElement.textContent = `مرات التنزيل: ${data.count || 0}`;
+            })
+            .catch(error => {
+                console.error("خطأ في جلب عداد التنزيلات:", error);
+                countDisplayElement.textContent = "لا يمكن عرض عدد التنزيلات";
+            });
+
+        // --- (ج) ربط زيادة العداد بزر التنزيل ---
         const downloadButton = document.getElementById("download-button");
         if (downloadButton) {
             downloadButton.addEventListener("click", () => {
-                // إنشاء مفتاح فريد لهذه اللعبة بناءً على نمطك
-                const gameKey = `azizstore-${game.id}`;
-                const namespace = "azizstore";
-                const apiUrl = `https://api.counterapi.dev/v1/${namespace}/${gameKey}/up`;
+                // هذا هو رابط الزيادة "up"
+                const upUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}/up`;
 
-                // إرسال طلب "hit" إلى CounterAPI
-                // هذا الطلب يتم في الخلفية ولن يؤخر تنزيل المستخدم
-                fetch(apiUrl)
+                fetch(upUrl)
                     .then(response => response.json())
                     .then(data => {
                         console.log(`تم تحديث عداد اللعبة ${gameKey}:`, data.count);
+                        // تحديث الرقم المعروض مباشرة بعد النقر
+                        if (countDisplayElement) {
+                            countDisplayElement.textContent = `مرات التنزيل: ${data.count}`;
+                        }
                     })
                     .catch(error => {
                         console.error("خطأ في تحديث عداد التنزيلات:", error);
+                        // ملاحظة: سيستمر التنزيل حتى لو فشل العداد
                     });
             });
         }
-        // (نهاية الكود المضاف)
+        // (نهاية الكود المحدث للعداد)
 
 
         // 1. عرض التعليقات الموجودة
@@ -200,9 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 text: userComment
             };
 
-            // محاكاة الإضافة الفورية
             displayComment(newComment, commentsList, true);
-
             reviewForm.reset();
             stars.forEach(s => s.classList.remove("selected"));
             ratingValueInput.value = "0";
