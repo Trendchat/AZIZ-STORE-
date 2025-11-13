@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // (*** هذا هو السطر الذي تم تصحيحه ***)
         // تم إزالة علامة / الزائدة من نهاية الرابط
-        const getCountUrl = `https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/game-1`;
+        const getCountUrl = `https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/game-1/stats`;
         
         countDisplayElement.textContent = "جارٍ التحميل..."; // نص مؤقت
 
@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (downloadButton) {
             downloadButton.addEventListener("click", () => {
                 // هذا هو رابط الزيادة "up" (وهو صحيح)
-                const upUrl = `https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/game-1/up`;
+                const upUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}/up`;
 
                 fetch(upUrl)
                     .then(response => response.json())
