@@ -9,8 +9,8 @@ const gamesDB = [
     genre: "مغامرات",
     price: "مجاني",
     rating: 4.5,
-    coverImage: "images/coverImage/1.webp",
-    screenshots: ["images/screenshots/1/1.webp", "images/screenshots/1/2.webp"],
+    coverImage: "images/coverImage/1.webp", // <-- تم التغيير
+    screenshots: ["images/screenshots/1/1.webp", "images/screenshots/1/2.webp"], // <-- تم التغيير
     description: "لعبة مغامرات مثيرة في عالم مفتوح لاستكشاف الأراضي المجهولة ومحاربة الوحوش.",
     downloadUrl: "nitro.zip", 
     comments: [
@@ -25,8 +25,8 @@ const gamesDB = [
     genre: "سباقات",
     price: "$9.99",
     rating: 4.2,
-    coverImage: "images/coverImage/2.webp",
-    screenshots: ["images/screenshots/2/1.webp"],
+    coverImage: "images/coverImage/2.webp", // <-- تم التغيير
+    screenshots: ["images/screenshots/2/1.webp"], // <-- تم التغيير
     description: "تحدى الجاذبية في سباقات سريعة عبر الكثبان الرملية.",
     downloadUrl: "downloads/desert_race.zip", 
     comments: [
@@ -40,8 +40,8 @@ const gamesDB = [
     genre: "ألغاز",
     price: "$4.99",
     rating: 4.8,
-    coverImage: "images/coverImage/3.webp",
-    screenshots: ["images/screenshots/3/1.webp"],
+    coverImage: "images/coverImage/3.webp", // <-- تم التغيير
+    screenshots: ["images/screenshots/3/1.webp"], // <-- تم التغيير
     description: "حل ألغاز معقدة في بيئة فضائية مذهلة.",
     downloadUrl: "downloads/space_puzzle.zip", 
     comments: []
@@ -53,8 +53,8 @@ const gamesDB = [
     genre: "أكشن",
     price: "$19.99",
     rating: 4.0,
-    coverImage: "images/coverImage/4.webp",
-    screenshots: ["images/screenshots/4/1.webp"],
+    coverImage: "images/coverImage/4.webp", // <-- تم التغيير
+    screenshots: ["images/screenshots/4/1.webp"], // <-- تم التغيير
     description: "قتال فضائي ملحمي للسيطرة على المجرة.",
     downloadUrl: "downloads/star_wars.zip", 
     comments: []
@@ -101,9 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         <a href="${game.downloadUrl}" id="download-button" class="download-button" download>
                             تنزيل الآن
                         </a>
-                        <p style="text-align: center; margin-top: 10px; color: #ccc;">
-                            <span id="download-count">...</span> تنزيلات
-                        </p>
                     </div>
                 </div>
             </div>
@@ -136,6 +133,30 @@ document.addEventListener("DOMContentLoaded", () => {
         container.innerHTML = gameDetailHTML;
         
         // --- تفعيل الوظائف الإضافية بعد تحميل المحتوى ---
+
+        // 0. تفعيل عداد التنزيلات (الكود المضاف)
+        const downloadButton = document.getElementById("download-button");
+        if (downloadButton) {
+            downloadButton.addEventListener("click", () => {
+                // إنشاء مفتاح فريد لهذه اللعبة بناءً على نمطك
+                const gameKey = `azizstore-${game.id}`;
+                const namespace = "azizstore";
+                const apiUrl = `https://api.counterapi.dev/v1/${namespace}/${gameKey}/up`;
+
+                // إرسال طلب "hit" إلى CounterAPI
+                // هذا الطلب يتم في الخلفية ولن يؤخر تنزيل المستخدم
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(`تم تحديث عداد اللعبة ${gameKey}:`, data.count);
+                    })
+                    .catch(error => {
+                        console.error("خطأ في تحديث عداد التنزيلات:", error);
+                    });
+            });
+        }
+        // (نهاية الكود المضاف)
+
 
         // 1. عرض التعليقات الموجودة
         const commentsList = document.getElementById("comments-list");
@@ -179,69 +200,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 text: userComment
             };
 
+            // محاكاة الإضافة الفورية
             displayComment(newComment, commentsList, true);
 
             reviewForm.reset();
             stars.forEach(s => s.classList.remove("selected"));
             ratingValueInput.value = "0";
         });
-        
-        // --- (جديد) كود تتبع التنزيلات ---
-
-        // (أ) تعريف العدادات
-        const countNamespace = "azizstore"; // يمكنك تغييره لأي اسم (مثل اسم متجرك)
-        const countKey = azizstore-1; // مفتاح فريد لكل لعبة
-        const downloadButton = document.getElementById("download-button");
-        const downloadUrl = downloadButton.href;
-        const downloadCountSpan = document.getElementById("download-count");
-
-        // (ب) دالة لجلب العداد عند تحميل الصفحة
-        function getDownloadCount() {
-            fetch(`https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/azizstore-1`)
-                .then(response => response.json())
-                .then(data => {
-                    downloadCountSpan.textContent = data.value || 0; // عرض القيمة أو 0
-                })
-                .catch(error => {
-                    console.error("خطأ في جلب العداد:", error);
-                    downloadCountSpan.textContent = "N/A";
-                });
-        }
-
-        // (ج) دالة لزيادة العداد عند الضغط
-        function incrementDownloadCount(event) {
-            // 1. منع التنزيل الفوري
-            event.preventDefault(); 
-            
-            downloadButton.textContent = "جاري التحضير...";
-            downloadButton.disabled = true;
-
-            // 2. إرسال طلب لزيادة العداد
-            fetch(`https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/azizstore-1/up \
-  -H "Authorization: Bearer ut_dDfcrrl9r2mg6ZJSQzLurHj82LehXkWQtDplIbrY"`)
-                .then(response => response.json())
-                .then(data => {
-                    // 3. تحديث الرقم في الصفحة
-                    downloadCountSpan.textContent = data.value;
-                    console.log(`تم تسجيل التنزيل! العدد الإجمالي: ${data.value}`);
-                })
-                .catch(error => {
-                    console.error("خطأ في تحديث العداد:", error);
-                })
-                .finally(() => {
-                    // 4. سواء نجح العداد أم لا، ابدأ التنزيل
-                    window.location.href = downloadUrl;
-                    downloadButton.textContent = "تنزيل الآن";
-                    downloadButton.disabled = false;
-                });
-        }
-
-        // (د) تفعيل الوظائف
-        getDownloadCount(); // جلب العداد عند فتح الصفحة
-        downloadButton.addEventListener("click", incrementDownloadCount); // تفعيل الزر
-
-        // --- نهاية كود تتبع التنزيلات ---
-
 
     } else {
         container.innerHTML = "<h1>عذراً، لم يتم العثور على اللعبة.</h1>";
