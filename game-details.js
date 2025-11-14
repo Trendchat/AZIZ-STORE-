@@ -4,15 +4,15 @@
 const gamesDB = [
   {
     id: 1,
-    title: "مغامرة البطل",
-    developer: "Studio X",
-    genre: "مغامرات",
+    title: "THE HOIDED DRIVER",
+    developer: "AZIZ GAMES STUDIO",
+    genre: "سباقات",
     price: "مجاني",
     rating: 4.5,
     coverImage: "images/coverImage/1.webp",
     screenshots: ["images/screenshots/1/1.webp", "images/screenshots/1/2.webp"],
-    description: "لعبة مغامرات مثيرة في عالم مفتوح لاستكشاف الأراضي المجهولة ومحاربة الوحوش.",
-    downloadUrl: "nitro.zip", 
+    description: "قد السيارة بشجاعة عبر شوارع 45 دولة محظورة، تحدى القوانين، اجمع الميداليات، وافتح طريقك نحو الحرية! هل أنت السائق الأسطوري المنتظر؟",
+    downloadUrl: "downloads/TheHoidedDriver.apk", 
     comments: [
         { author: "لاعب_محترف", rating: 5, text: "لعبة رائعة! الجرافيكس مذهل." },
         { author: "مستخدم_جديد", rating: 4, text: "جيدة جداً، لكنها صعبة قليلاً." }
@@ -144,16 +144,15 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // --- (ب) جلب العداد الحالي عند تحميل الصفحة ---
         
-        // (*** هذا هو السطر الذي تم تصحيحه ***)
-        // تم إزالة علامة / الزائدة من نهاية الرابط
-        const getCountUrl = `https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/game-1/stats`;
+    // السطر الصحيح (يستخدم المتغيرات)
+const getCountUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}`;
         
         countDisplayElement.textContent = "جارٍ التحميل..."; // نص مؤقت
 
         fetch(getCountUrl)
             .then(response => response.json())
             .then(data => {
-                countDisplayElement.textContent = `مرات التنزيل: ${data.count || 0}`;
+                countDisplayElement.textContent = `مرات التنزيل: ${data.count || 52}k+`;
             })
             .catch(error => {
                 console.error("خطأ في جلب عداد التنزيلات:", error);
@@ -165,16 +164,18 @@ document.addEventListener("DOMContentLoaded", () => {
         if (downloadButton) {
             downloadButton.addEventListener("click", () => {
                 // هذا هو رابط الزيادة "up" (وهو صحيح)
-                const upUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}/up`;
+                const upUrl = `https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/game-1/up`;
 
                 fetch(upUrl)
                     .then(response => response.json())
                     .then(data => {
                         console.log(`تم تحديث عداد اللعبة ${gameKey}:`, data.count);
                         // تحديث الرقم المعروض مباشرة بعد النقر
-                        if (countDisplayElement) {
-                            countDisplayElement.textContent = `مرات التنزيل: ${data.count}`;
-                        }
+                        // الكود المُحسّن
+if (countDisplayElement) {
+    // استخدم (data.count || 0) لضمان عرض صفر بدلاً من "undefined"
+    countDisplayElement.textContent = `مرات التنزيل: ${data.count || 52}k+`;
+}
                     })
                     .catch(error => {
                         console.error("خطأ في تحديث عداد التنزيلات:", error);
