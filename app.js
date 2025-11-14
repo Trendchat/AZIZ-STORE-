@@ -2,43 +2,15 @@
 const gamesDB = [
   {
     id: 1,
-    title: "مغامرة البطل",
-    developer: "Studio X",
-    genre: "مغامرات",
+    title: "THE HOIDED DRIVER",
+    developer: "AZIZ GAMES STUDIO",
+    genre: "سباقات",
     price: "مجاني",
     rating: 4.5,
     coverImage: "images/coverImage/1.webp",
-    description: "لعبة مغامرات مثيرة في عالم مفتوح لاستكشاف الأراضي المجهولة." // <-- وصف مضاف
-  },
-  {
-    id: 2,
-    title: "سباق الصحراء",
-    developer: "Speed Inc.",
-    genre: "سباقات",
-    price: "$9.99",
-    rating: 4.2,
-    coverImage: "images/coverImage/2.webp",
-    description: "تحدى الجاذبية في سباقات سريعة عبر الكثبان الرملية." // <-- وصف مضاف
-  },
-  {
-    id: 3,
-    title: "لغز الفضاء",
-    developer: "Mind Games",
-    genre: "ألغاز",
-    price: "$4.99",
-    rating: 4.8,
-    coverImage: "images/coverImage/3.webp",
-    description: "حل ألغاز معقدة في بيئة فضائية مذهلة." // <-- وصف مضاف
-  },
-  {
-    id: 4,
-    title: "حرب النجوم",
-    developer: "Galaxy Dev",
-    genre: "أكشن",
-    price: "$19.99",
-    rating: 4.0,
-    coverImage: "images/coverImage/4.webp",
-    description: "قتال فضائي ملحمي للسيطرة على المجرة." // <-- وصف مضاف
+    screenshots: ["images/screenshots/1/1.webp", "images/screenshots/1/2.webp"],
+    description: "قد السيارة بشجاعة عبر شوارع 45 دولة محظورة، تحدى القوانين، اجمع الميداليات، وافتح طريقك نحو الحرية! هل أنت السائق الأسطوري المنتظر؟",
+  //باقي الالعاب هنا وأضافة قوس لكل الالعاب بنقطة},
   }
 ];
 
