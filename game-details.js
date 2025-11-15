@@ -15,7 +15,7 @@ const gamesDB = [
     
     // --- (التعديل الأول) ---
     // تم استبدال الرابط المحلي بالرابط الخارجي الذي قدمته
-    downloadUrl: "https://drive.google.com/uc?export=download&id=12m2PCaaLY4dBPCRDFMXnVE7fvM7IW4wU", 
+    downloadUrl: "https://drive.google.com/uc?export=download&id=1ZpIjuLMcVa9t_wtIhNJRFHUIeK3uLEgD", 
     
     comments: [
         { author: "لاعب_محترف", rating: 5, text: "لعبة رائعة! الجرافيكس مذهل." },
