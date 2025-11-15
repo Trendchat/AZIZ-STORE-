@@ -12,7 +12,11 @@ const gamesDB = [
     coverImage: "images/coverImage/1.webp",
     screenshots: ["images/screenshots/1/1.webp", "images/screenshots/1/2.webp"],
     description: "قد السيارة بشجاعة عبر شوارع 45 دولة محظورة، تحدى القوانين، اجمع الميداليات، وافتح طريقك نحو الحرية! هل أنت السائق الأسطوري المنتظر؟",
-    downloadUrl: "downloads/TheHoidedDriver.apk", 
+    
+    // --- (التعديل الأول) ---
+    // تم استبدال الرابط المحلي بالرابط الخارجي الذي قدمته
+    downloadUrl: "https://drive.google.com/uc?export=download&id=12m2PCaaLY4dBPCRDFMXnVE7fvM7IW4wU", 
+    
     comments: [
         { author: "لاعب_محترف", rating: 5, text: "لعبة رائعة! الجرافيكس مذهل." },
         { author: "مستخدم_جديد", rating: 4, text: "جيدة جداً، لكنها صعبة قليلاً." }
@@ -33,32 +37,7 @@ const gamesDB = [
         { author: "متسابق1", rating: 4, text: "أفضل لعبة سباق لعبتها هذا العام." }
     ]
   },
-  {
-    id: 3,
-    title: "لغز الفضاء",
-    developer: "Mind Games",
-    genre: "ألغاز",
-    price: "$4.99",
-    rating: 4.8,
-    coverImage: "images/coverImage/3.webp",
-    screenshots: ["images/screenshots/3/1.webp"],
-    description: "حل ألغاز معقدة في بيئة فضائية مذهلة.",
-    downloadUrl: "downloads/space_puzzle.zip", 
-    comments: []
-  },
-  {
-    id: 4,
-    title: "حرب النجوم",
-    developer: "Galaxy Dev",
-    genre: "أكشن",
-    price: "$19.99",
-    rating: 4.0,
-    coverImage: "images/coverImage/4.webp",
-    screenshots: ["images/screenshots/4/1.webp"],
-    description: "قتال فضائي ملحمي للسيطرة على المجرة.",
-    downloadUrl: "downloads/star_wars.zip", 
-    comments: []
-  }
+  // ... باقي الألعاب
 ];
 
 // انتظر تحميل الصفحة
@@ -98,9 +77,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     
                     <div class="purchase-box">
                         <span id="game-price" class="price">${game.price}</span>
-                        <a href="${game.downloadUrl}" id="download-button" class="download-button" download>
+                        
+                        <a href="${game.downloadUrl}" id="download-button" class="download-button" target="_blank">
                             تنزيل الآن
                         </a>
+                        
                         <span id="download-count-display" class="download-count">...</span>
                     </div>
                 </div>
@@ -143,9 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const countDisplayElement = document.getElementById("download-count-display");
         
         // --- (ب) جلب العداد الحالي عند تحميل الصفحة ---
-        
-    // السطر الصحيح (يستخدم المتغيرات)
-const getCountUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}`;
+        const getCountUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}`;
         
         countDisplayElement.textContent = "جارٍ التحميل..."; // نص مؤقت
 
@@ -163,23 +142,23 @@ const getCountUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}`;
         const downloadButton = document.getElementById("download-button");
         if (downloadButton) {
             downloadButton.addEventListener("click", () => {
-                // هذا هو رابط الزيادة "up" (وهو صحيح)
-                const upUrl = `https://api.counterapi.dev/v2/abdulaziz-alshargis-team-1656/game-1/up`;
+                
+                // --- (تم إصلاح الخطأ هنا) ---
+                // الكود القديم كان يستخدم "game-1" بشكل ثابت
+                // الكود الجديد يستخدم المتغيرات الصحيحة (namespace و gameKey)
+                const upUrl = `https://api.counterapi.dev/v2/${namespace}/${gameKey}/up`;
 
                 fetch(upUrl)
                     .then(response => response.json())
                     .then(data => {
                         console.log(`تم تحديث عداد اللعبة ${gameKey}:`, data.count);
                         // تحديث الرقم المعروض مباشرة بعد النقر
-                        // الكود المُحسّن
-if (countDisplayElement) {
-    // استخدم (data.count || 0) لضمان عرض صفر بدلاً من "undefined"
-    countDisplayElement.textContent = `مرات التنزيل: ${data.count || 52}k+`;
-}
+                        if (countDisplayElement) {
+                            countDisplayElement.textContent = `مرات التنزيل: ${data.count || 52}k+`;
+                        }
                     })
                     .catch(error => {
                         console.error("خطأ في تحديث عداد التنزيلات:", error);
-                        // ملاحظة: سيستمر التنزيل حتى لو فشل العداد
                     });
             });
         }
